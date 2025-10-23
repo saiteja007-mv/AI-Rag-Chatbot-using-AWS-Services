@@ -1,0 +1,50 @@
+# Lambda deployment packages
+*.zip
+
+# Temporary files
+*.tmp
+*.temp
+upload-response.json
+
+# Assessment documents
+*.docx
+*.pdf
+
+# Images (keep only essential ones)
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Node modules (if any)
+node_modules/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# AWS credentials (never commit these)
+.aws/
+credentials
+config

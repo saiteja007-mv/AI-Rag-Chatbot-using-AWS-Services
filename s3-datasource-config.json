@@ -1,0 +1,8 @@
+{
+    "S3Configuration": {
+        "BucketName": "ai-rag-documents-g6",
+        "DocumentsMetadataConfiguration": {
+            "S3Prefix": "documents/"
+        }
+    }
+}
