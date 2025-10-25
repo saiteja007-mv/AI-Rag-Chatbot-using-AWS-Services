@@ -10,11 +10,6 @@ upload-response.json
 *.docx
 *.pdf
 
-# Images (keep only essential ones)
-*.png
-*.jpg
-*.jpeg
-*.gif
 
 # IDE files
 .vscode/
