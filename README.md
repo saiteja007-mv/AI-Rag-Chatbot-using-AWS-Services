@@ -2,6 +2,14 @@
 
 A sophisticated Retrieval-Augmented Generation (RAG) chatbot built on AWS that allows users to upload documents and ask questions about their content using AI-powered responses.
 
+## 🎯 Quick Demo
+
+### Login Interface
+![Login Page](Outputs/Login%20Page.png)
+
+### Chat Interface with Document Upload
+![Chatbot Output using PDFs](Outputs/Chatbot%20Output%20using%20PDFs.png)
+
 ## 🚀 Features
 
 - **User Authentication**: Secure login and registration system with JWT tokens
@@ -205,32 +213,54 @@ Visit the S3 website URL: `http://rag-chatbot-web-1761415396.s3-website.us-east-
 
 ### 2. User Registration/Login
 
+![Login Page](Outputs/Login%20Page.png)
+
 - Create a new account or sign in with existing credentials
 - Secure authentication with JWT tokens
+- Clean, intuitive interface for user management
 
 ### 3. Upload Documents
 
 - Drag and drop PDF, DOC, or DOCX files
 - Files are automatically indexed by Amazon Kendra
 - Maximum file size: 5MB
+- Real-time upload progress indication
 
 ### 4. Chat with Documents
+
+![Chatbot Output using PDFs](Outputs/Chatbot%20Output%20using%20PDFs.png)
 
 - Ask questions about your uploaded documents
 - AI responses are generated using Amazon Bedrock
 - Conversation history is maintained during the session
+- Interactive chat interface with document management panel
 
 ## 📸 Screenshots
 
 ### Login Page
-
 ![Login Page](Outputs/Login%20Page.png)
 *Clean, modern login interface with registration option*
 
 ### Chat Interface
-
 ![Chatbot Output using PDFs](Outputs/Chatbot%20Output%20using%20PDFs.png)
 *Interactive chat interface showing document upload and AI responses*
+
+### Application Features Showcase
+
+The screenshots above demonstrate the key features of the RAG chatbot:
+
+**Login Page Features:**
+- User-friendly authentication interface
+- Registration and login forms
+- Clean, modern design with black and white theme
+- Responsive layout
+
+**Chat Interface Features:**
+- Document upload area with drag-and-drop functionality
+- Real-time chat with AI responses
+- Document management panel
+- User session information
+- Interactive Q&A based on uploaded documents
 
 ## 🔒 Security Features
 
