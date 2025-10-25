@@ -2,6 +2,26 @@
 
 A sophisticated Retrieval-Augmented Generation (RAG) chatbot built on AWS that allows users to upload documents and ask questions about their content using AI-powered responses.
 
+## 📋 Table of Contents
+
+- [🎯 Quick Demo](#-quick-demo)
+- [🚀 Features](#-features)
+- [🏗️ Architecture](#️-architecture)
+- [📁 Project Structure](#-project-structure)
+- [🛠️ AWS Services Used](#️-aws-services-used)
+- [🔧 Setup Instructions](#-setup-instructions)
+- [🎯 Usage](#-usage)
+- [📸 Screenshots](#-screenshots)
+- [🔒 Security Features](#-security-features)
+- [🚀 Performance Optimizations](#-performance-optimizations)
+- [📊 API Endpoints](#-api-endpoints)
+- [🔧 Configuration](#-configuration)
+- [🐛 Troubleshooting](#-troubleshooting)
+- [📈 Future Enhancements](#-future-enhancements)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+- [👥 Team](#-team)
+
 ## 🎯 Quick Demo
 
 ### Login Interface
