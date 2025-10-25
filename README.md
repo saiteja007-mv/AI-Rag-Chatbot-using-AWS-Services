@@ -4,10 +4,6 @@ A sophisticated Retrieval-Augmented Generation (RAG) chatbot built on AWS that a
 
 ## 🎯 Quick Demo
 
-### System Architecture
-![AI-Powered RAG Chat Bot](assets/AI-Powered%20RAG%20Chat%20Bot.png)
-*Serverless AWS architecture overview*
-
 ### Login Interface
 ![Login Page](Outputs/Login%20Page.png)
 
@@ -27,11 +23,13 @@ A sophisticated Retrieval-Augmented Generation (RAG) chatbot built on AWS that a
 
 The application uses a serverless architecture with the following AWS services:
 
+### System Architecture Overview
 ![AI-Powered RAG Chat Bot](assets/AI-Powered%20RAG%20Chat%20Bot.png)
-*High-level architecture overview*
+*High-level system architecture overview*
 
+### Detailed Workflow (Main Architecture)
 ![AI-Powered RAG Chat Bot V 2](assets/AI-Powered%20RAG%20Chat%20Bot%20V%202.png)
-*Detailed architecture diagram with service interactions*
+*Detailed architecture diagram showing the complete workflow and service interactions*
 
 ### Core Components:
 
@@ -50,7 +48,7 @@ The application uses a serverless architecture with the following AWS services:
 3. **AI Processing**: User queries are processed through Kendra search, then enhanced with AI responses via Amazon Bedrock
 4. **Response Delivery**: AI-generated responses are returned through the API Gateway to the frontend
 
-The architecture diagrams above show both the high-level system overview and detailed service interactions, demonstrating how each AWS service works together to create a seamless RAG chatbot experience.
+The architecture diagrams above show both the high-level system overview and the detailed workflow (V2), demonstrating how each AWS service works together to create a seamless RAG chatbot experience.
 
 ## 📁 Project Structure
 
