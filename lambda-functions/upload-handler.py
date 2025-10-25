@@ -1,35 +1,30 @@
 import json
 import boto3
-import os
 import base64
 import time
 import uuid
 import secrets
 
+DOCUMENTS_BUCKET = 'rag-chatbot-docs-1761415396'
+KENDRA_INDEX_ID = 'a1698683-7390-406c-b969-1356535e71b6'
+KENDRA_DATA_SOURCE_ID = 'a7852dcd-ef30-4f75-becd-69d8344191ff'
+USERS_TABLE = 'rag-chatbot-users'
+SESSIONS_TABLE = 'rag-chatbot-sessions'
+
 s3_client = boto3.client('s3')
+kendra_client = boto3.client('kendra')
 dynamodb = boto3.resource('dynamodb')
-
-DOCUMENTS_BUCKET = os.environ.get('DOCUMENTS_BUCKET')
-KENDRA_INDEX_ID = os.environ.get('KENDRA_INDEX_ID')
-KENDRA_DATA_SOURCE_ID = os.environ.get('KENDRA_DATA_SOURCE_ID')
-USERS_TABLE = os.environ.get('USERS_TABLE', 'rag-chatbot-users')
-SESSIONS_TABLE = os.environ.get('SESSIONS_TABLE', 'rag-chatbot-sessions')
-
-USERS = dynamodb.Table(USERS_TABLE)
 SESSIONS = dynamodb.Table(SESSIONS_TABLE)
 
 
 def lambda_handler(event, context):
     try:
         session = authenticate(event)
-        body = json.loads(event.get('body') or '{}')
+        body = json.loads(event.get('body', '{}'))
 
         file_name = body.get('fileName')
         file_content = body.get('fileContent')
         file_type = body.get('fileType')
-
-        if not DOCUMENTS_BUCKET:
-            raise ValueError('DOCUMENTS_BUCKET environment variable is not set')
 
         if not all([file_name, file_content, file_type]):
             return response(400, {'error': 'Missing required fields'})
@@ -69,17 +64,15 @@ def start_kendra_sync():
     if not (KENDRA_INDEX_ID and KENDRA_DATA_SOURCE_ID):
         return None
 
-    client = boto3.client('kendra')
     try:
-        result = client.start_data_source_sync_job(
+        result = kendra_client.start_data_source_sync_job(
             Id=KENDRA_DATA_SOURCE_ID,
             IndexId=KENDRA_INDEX_ID
         )
         return result.get('ExecutionId')
-    except client.exceptions.ConflictException:
+    except kendra_client.exceptions.ConflictException:
         return None
-    except Exception as error:
-        print('Failed to start Kendra sync job:', error)
+    except Exception:
         return None
 
 
@@ -88,15 +81,15 @@ def authenticate(event):
     auth_header = headers.get('Authorization') or headers.get('authorization')
 
     if not auth_header or not auth_header.lower().startswith('bearer '):
-        raise AuthError(401, 'Authorization token missing')
+        raise AuthError(401, 'Authorization required')
 
     token = auth_header.split()[1]
     session = SESSIONS.get_item(Key={'token': token}).get('Item')
     if not session:
-        raise AuthError(401, 'Invalid or expired session token')
+        raise AuthError(401, 'Invalid token')
 
     if session.get('expiresAt') and session['expiresAt'] < int(time.time()):
-        raise AuthError(401, 'Session token has expired')
+        raise AuthError(401, 'Token expired')
 
     return session
 
