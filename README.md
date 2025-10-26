@@ -441,19 +441,8 @@ Response:
 - **Wait**: Try again after 30 seconds
 - **Refresh**: Reload the page first
 
----
-
-## ✅ How to Get Help
-
-**Check These First:**
-1. Refresh the page (Ctrl+F5 or Cmd+Shift+R)
-2. Clear browser cookies
-3. Try a different browser
-4. Check your internet connection
-5. Wait 5 minutes and try again
-
 **Still Having Issues?**
-- 📧 Email: saiteja@student.ucmo.edu
+- 📧 Email: saiteja.motukuri@gmail.com
 - 💬 Create an issue on GitHub
 - 📞 Check the documentation for more details
 
@@ -496,21 +485,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 **Developer**: Sai Teja
 **Institution**: University of Central Missouri
 **Course**: Intro to Cloud Computing (Fall 2025)
-**Contact**: saiteja@student.ucmo.edu
 
----
-
-## 🎓 Learning Outcomes
-
-This project demonstrates:
-- ✅ Serverless architecture design
-- ✅ AWS service integration
-- ✅ AI/ML model integration
-- ✅ RESTful API development
-- ✅ Responsive web design
-- ✅ Cloud-native security practices
-- ✅ Document indexing and search
-- ✅ Authentication & authorization
 
 ---
 
@@ -523,16 +498,6 @@ This project demonstrates:
 | Document Upload | < 10 seconds |
 | Kendra Indexing | 2-10 minutes |
 | Session Expiry | 7 days |
-
----
-
-## 🔗 Quick Links
-
-- 📚 **[Documentation](docs/)** - Full project documentation
-- 📸 **[Screenshots](Outputs/)** - UI/UX demonstrations
-- 🏗️ **[Architecture Diagram](assets/)** - System architecture
-- 🐛 **[Issue Tracker](../../issues)** - Report bugs
-- 💬 **[Discussions](../../discussions)** - Ask questions
 
 ---
 
