@@ -58,6 +58,38 @@ body {
     outline-offset: 2px;
 }
 
+/* Password Checkbox Label */
+.password-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+    margin-top: 8px;
+}
+
+.password-checkbox-label input[type="checkbox"] {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    padding: 0;
+    accent-color: #000000;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.password-checkbox-label input[type="checkbox"]:focus {
+    outline: none;
+}
+
+.password-checkbox-label input[type="checkbox"]:focus-visible {
+    outline: 2px solid #000000;
+    outline-offset: 2px;
+}
+
 .auth-card button {
     width: 100%;
     padding: 12px;
@@ -155,14 +187,17 @@ body {
     scrollbar-color: #000000 #ffffff;
 }
 
-.sidebar-section:first-child {
+/* Chat Sessions Section - Top, takes more space */
+.sidebar-section.sessions-section {
     flex: 1 1 auto;
     min-height: 0;
 }
 
-.sidebar-section:last-child {
-    flex: 1 1 auto;
-    min-height: 0;
+/* Documents Section - Bottom, controlled height */
+.sidebar-section.documents-section {
+    flex: 0 1 auto;
+    min-height: 300px;
+    max-height: 400px;
     border-top: 1px solid #000000;
 }
 
@@ -536,8 +571,15 @@ body {
         font-size: 12px;
     }
 
-    .sidebar-section:last-child {
-        border-top: 1px solid #000000;
+    .sidebar-section.sessions-section {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+
+    .sidebar-section.documents-section {
+        flex: 0 1 auto;
+        min-height: auto;
+        max-height: none;
     }
 
     .sessions-header h2 {
