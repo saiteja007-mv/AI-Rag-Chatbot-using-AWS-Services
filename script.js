@@ -163,6 +163,25 @@ function handleLogout() {
     showNotification('Logged out', 'success');
 }
 
+// Password visibility toggle functions
+function toggleLoginPassword() {
+    const passwordInput = document.getElementById('loginPassword');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+    } else {
+        passwordInput.type = 'password';
+    }
+}
+
+function toggleRegisterPassword() {
+    const passwordInput = document.getElementById('registerPassword');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+    } else {
+        passwordInput.type = 'password';
+    }
+}
+
 // Upload Functions
 function initializeUpload() {
     uploadArea.addEventListener('click', () => fileInput.click());

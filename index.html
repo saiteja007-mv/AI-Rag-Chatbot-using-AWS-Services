@@ -20,6 +20,10 @@
                 <form id="loginForm">
                     <input type="email" id="loginEmail" placeholder="Email" required>
                     <input type="password" id="loginPassword" placeholder="Password" required>
+                    <label class="password-checkbox-label">
+                        <input type="checkbox" id="loginPasswordToggle" onclick="toggleLoginPassword()">
+                        Show Password
+                    </label>
                     <button type="submit">Sign In</button>
                 </form>
                 <p class="auth-switch">Don't have an account? <a href="#" id="showRegister">Register</a></p>
@@ -32,6 +36,10 @@
                     <input type="text" id="registerName" placeholder="Name" required>
                     <input type="email" id="registerEmail" placeholder="Email" required>
                     <input type="password" id="registerPassword" placeholder="Password (8+ characters)" required>
+                    <label class="password-checkbox-label">
+                        <input type="checkbox" id="registerPasswordToggle" onclick="toggleRegisterPassword()">
+                        Show Password
+                    </label>
                     <button type="submit">Create Account</button>
                 </form>
                 <p class="auth-switch">Already have an account? <a href="#" id="showLogin">Sign In</a></p>
@@ -52,10 +60,26 @@
 
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Sidebar with Documents and Chat History -->
+            <!-- Sidebar with Chat Sessions and Documents -->
             <aside class="sidebar">
-                <!-- Documents Section -->
-                <div class="sidebar-section">
+                <!-- Chat Sessions Section (Top) -->
+                <div class="sidebar-section sessions-section">
+                    <div class="sessions-header">
+                        <h2>Chat Sessions</h2>
+                        <button id="newChatButton" class="new-chat-btn">+ New</button>
+                    </div>
+
+                    <!-- Sessions List -->
+                    <div id="sessionsList" class="sessions-list">
+                        <p class="no-sessions">No chat sessions</p>
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="sidebar-divider"></div>
+
+                <!-- Documents Section (Bottom) -->
+                <div class="sidebar-section documents-section">
                     <h2>Documents</h2>
 
                     <!-- Upload Area -->
@@ -75,22 +99,6 @@
                     <!-- Files List -->
                     <div id="filesList" class="files-list">
                         <p class="no-files">No documents uploaded</p>
-                    </div>
-                </div>
-
-                <!-- Divider -->
-                <div class="sidebar-divider"></div>
-
-                <!-- Chat Sessions Section -->
-                <div class="sidebar-section">
-                    <div class="sessions-header">
-                        <h2>Chat Sessions</h2>
-                        <button id="newChatButton" class="new-chat-btn">+ New</button>
-                    </div>
-
-                    <!-- Sessions List -->
-                    <div id="sessionsList" class="sessions-list">
-                        <p class="no-sessions">No chat sessions</p>
                     </div>
                 </div>
             </aside>
