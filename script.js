@@ -6,6 +6,8 @@ let authToken = null;
 let currentUser = null;
 let uploadedFiles = [];
 let chatHistory = [];
+let currentSessionId = null;
+let chatSessions = [];
 
 // DOM Elements
 const authContainer = document.getElementById('authContainer');
@@ -27,12 +29,15 @@ const filesList = document.getElementById('filesList');
 const chatMessages = document.getElementById('chatMessages');
 const chatInput = document.getElementById('chatInput');
 const sendButton = document.getElementById('sendButton');
+const newChatButton = document.getElementById('newChatButton');
+const sessionsList = document.getElementById('sessionsList');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     initializeAuth();
     initializeUpload();
     initializeChat();
+    initializeSessions();
     attemptSessionRestore();
 });
 
@@ -117,6 +122,7 @@ function applySession(data) {
     userNameDisplay.textContent = data.user.name;
     authContainer.style.display = 'none';
     appContainer.style.display = 'flex';
+    loadChatSessions();
 }
 
 function attemptSessionRestore() {
@@ -132,6 +138,7 @@ function attemptSessionRestore() {
             authContainer.style.display = 'none';
             appContainer.style.display = 'flex';
             loadDocuments();
+            loadChatSessions();
         }
     } catch (error) {
         console.error('Session restore failed:', error);
@@ -143,6 +150,8 @@ function handleLogout() {
     currentUser = null;
     uploadedFiles = [];
     chatHistory = [];
+    currentSessionId = null;
+    chatSessions = [];
     localStorage.removeItem('ragAuthSession');
     authContainer.style.display = 'flex';
     appContainer.style.display = 'none';
@@ -150,6 +159,7 @@ function handleLogout() {
     registerCard.style.display = 'none';
     filesList.innerHTML = '<p class="no-files">No documents uploaded</p>';
     chatMessages.innerHTML = '<div class="message bot-message"><p>Hello! Upload documents and ask me questions about them.</p></div>';
+    sessionsList.innerHTML = '<p class="no-sessions">No chat sessions</p>';
     showNotification('Logged out', 'success');
 }
 
@@ -331,6 +341,108 @@ function hideUploadProgress() {
     }, 1000);
 }
 
+// Chat Session Functions
+function initializeSessions() {
+    newChatButton.addEventListener('click', startNewChat);
+}
+
+function startNewChat() {
+    currentSessionId = null;
+    chatHistory = [];
+    chatMessages.innerHTML = '<div class="message bot-message"><p>Hello! Upload documents and ask me questions about them.</p></div>';
+    chatInput.value = '';
+    updateSessionsList();
+}
+
+async function loadChatSessions() {
+    if (!authToken) return;
+
+    try {
+        const stored = localStorage.getItem(`ragChatSessions_${currentUser.id}`);
+        if (stored) {
+            chatSessions = JSON.parse(stored);
+        } else {
+            chatSessions = [];
+        }
+        updateSessionsList();
+    } catch (error) {
+        console.error('Failed to load sessions:', error);
+    }
+}
+
+async function saveChatSession() {
+    if (!authToken || !currentSessionId || chatHistory.length === 0) return;
+
+    try {
+        // Update session in local storage
+        const sessionIndex = chatSessions.findIndex(s => s.id === currentSessionId);
+        if (sessionIndex !== -1) {
+            chatSessions[sessionIndex] = {
+                id: currentSessionId,
+                title: chatHistory[0]?.content?.substring(0, 50) || 'Untitled Chat',
+                timestamp: new Date(chatSessions[sessionIndex].timestamp),
+                messages: chatHistory
+            };
+        }
+        localStorage.setItem(`ragChatSessions_${currentUser.id}`, JSON.stringify(chatSessions));
+        updateSessionsList();
+    } catch (error) {
+        console.error('Failed to save session:', error);
+    }
+}
+
+function updateSessionsList() {
+    if (!chatSessions || chatSessions.length === 0) {
+        sessionsList.innerHTML = '<p class="no-sessions">No chat sessions</p>';
+        return;
+    }
+
+    sessionsList.innerHTML = chatSessions
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .map(session => `
+            <div class="session-item ${session.id === currentSessionId ? 'active' : ''}" onclick="loadChatSession('${session.id}')">
+                <div class="session-info">
+                    <span class="session-title">${escapeHtml(session.title)}</span>
+                    <span class="session-date">${new Date(session.timestamp).toLocaleDateString()}</span>
+                </div>
+                <button class="session-delete-btn" onclick="event.stopPropagation(); deleteSession('${session.id}')">Delete</button>
+            </div>
+        `).join('');
+}
+
+function deleteSession(sessionId) {
+    const sessionIndex = chatSessions.findIndex(s => s.id === sessionId);
+    if (sessionIndex === -1) return;
+
+    chatSessions.splice(sessionIndex, 1);
+    if (currentSessionId === sessionId) {
+        startNewChat();
+    } else {
+        updateSessionsList();
+    }
+    localStorage.setItem(`ragChatSessions_${currentUser.id}`, JSON.stringify(chatSessions));
+    showNotification('Chat session deleted', 'success');
+}
+
+function loadChatSession(sessionId) {
+    const session = chatSessions.find(s => s.id === sessionId);
+    if (!session) return;
+
+    currentSessionId = sessionId;
+    chatHistory = session.messages || [];
+
+    // Clear and repopulate messages
+    chatMessages.innerHTML = session.messages
+        .map(msg => `
+            <div class="message ${msg.role}-message">
+                <p>${escapeHtml(msg.content)}</p>
+            </div>
+        `).join('');
+
+    scrollToBottom();
+    updateSessionsList();
+}
+
 // Chat Functions
 function initializeChat() {
     sendButton.addEventListener('click', sendMessage);
@@ -350,6 +462,17 @@ async function sendMessage() {
 
     const message = chatInput.value.trim();
     if (!message) return;
+
+    // Create new session if this is the first message
+    if (!currentSessionId) {
+        currentSessionId = 'session_' + Date.now();
+        chatSessions.unshift({
+            id: currentSessionId,
+            title: message.substring(0, 50),
+            timestamp: new Date().toISOString(),
+            messages: []
+        });
+    }
 
     addMessageToChat(message, 'user');
     chatInput.value = '';
@@ -381,6 +504,8 @@ async function sendMessage() {
 
         chatHistory.push({ role: 'user', content: message });
         chatHistory.push({ role: 'assistant', content: data.response });
+
+        saveChatSession();
     } catch (error) {
         removeTypingIndicator(typingId);
         addMessageToChat('Sorry, an error occurred. Please try again.', 'bot');
