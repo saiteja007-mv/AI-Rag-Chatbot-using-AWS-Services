@@ -148,155 +148,145 @@ The architecture diagram above shows the complete workflow, demonstrating how ea
 - **JWT Tokens**: Secure session management
 - **CORS**: Cross-origin resource sharing
 
-## 🔧 Setup Instructions
+## 🚀 Quick Start Guide
 
 ### Prerequisites
 
-- AWS CLI configured with appropriate permissions
-- Python 3.9+ for Lambda functions
-- Node.js (optional, for local development)
+- AWS Account with appropriate permissions
+- Modern web browser (Chrome, Safari, Firefox, Edge)
+- Internet connection
 
-### 1. Create AWS Resources
+### Step 1: Access the Application
 
-#### S3 Buckets
-
-```bash
-# Create web hosting bucket
-aws s3 mb s3://rag-chatbot-web-1761415396 --region us-east-2
-
-# Create documents bucket
-aws s3 mb s3://rag-chatbot-docs-1761415396 --region us-east-2
-
-# Apply bucket policies
-aws s3api put-bucket-policy --bucket rag-chatbot-web-1761415396 --policy file://config/bucket-policy.json
+Simply visit the deployed website:
+```
+http://rag-chatbot-web-1761415396.s3-website.us-east-2.amazonaws.com
 ```
 
-#### DynamoDB Tables
+No installation or setup required! The application is already deployed and ready to use.
 
-```bash
-# Users table
-aws dynamodb create-table \
-    --table-name rag-chatbot-users \
-    --attribute-definitions AttributeName=email,AttributeType=S \
-    --key-schema AttributeName=email,KeyType=HASH \
-    --billing-mode PAY_PER_REQUEST \
-    --region us-east-2
+### Step 2: Create an Account
 
-# Sessions table
-aws dynamodb create-table \
-    --table-name rag-chatbot-sessions \
-    --attribute-definitions AttributeName=token,AttributeType=S \
-    --key-schema AttributeName=token,KeyType=HASH \
-    --billing-mode PAY_PER_REQUEST \
-    --region us-east-2
-```
+1. Click **"Register"** on the login page
+2. Enter your name, email, and password
+3. Click **"Create Account"**
+4. You'll be automatically logged in
 
-#### IAM Roles
+### Step 3: Upload Documents
 
-```bash
-# Create Lambda execution role
-aws iam create-role \
-    --role-name rag-chatbot-lambda-role \
-    --assume-role-policy-document file://config/lambda-trust-policy.json
+1. **Drag & Drop**: Drag PDF or Word files into the upload area
+2. **Or Click**: Click the upload area to select files from your computer
+3. **Supported Formats**:
+   - PDF (.pdf)
+   - Microsoft Word (.doc, .docx)
+4. **Maximum Size**: 5MB per file
+5. **Wait**: Kendra will index the document (2-10 minutes)
 
-# Attach permissions policy
-aws iam put-role-policy \
-    --role-name rag-chatbot-lambda-role \
-    --policy-name LambdaPermissions \
-    --policy-document file://config/lambda-permissions-policy.json
-```
+### Step 4: Start Chatting
 
-### 2. Deploy Lambda Functions
+1. Type your question in the chat input box
+2. Press **Enter** or click **Send**
+3. The AI will search your documents and provide an answer
+4. Continue the conversation as needed
 
-```bash
-# Package and deploy each Lambda function
-cd lambda-functions
-zip auth-handler.zip auth-handler.py
-aws lambda create-function \
-    --function-name rag-chatbot-auth \
-    --runtime python3.9 \
-    --role arn:aws:iam::YOUR_ACCOUNT:role/rag-chatbot-lambda-role \
-    --handler auth-handler.lambda_handler \
-    --zip-file fileb://auth-handler.zip
+### Step 5: Manage Chat Sessions
 
-# Repeat for other functions: chat-handler, upload-handler, delete-handler, documents-handler
-cd ..
-```
+1. **New Chat**: Click **"+ New"** to start a fresh conversation
+2. **View Previous**: Click any session in the "Chat Sessions" panel
+3. **Delete Session**: Click **"Delete"** next to a session you don't need
 
-### 3. Create API Gateway
+---
 
-```bash
-# Create REST API
-aws apigateway create-rest-api \
-    --name rag-chatbot-api \
-    --description "RAG Chatbot API" \
-    --region us-east-2
+## 📁 Project Resources
 
-# Create resources and methods for each endpoint
-# /register, /login, /chat, /upload, /delete, /documents
-```
+### Cloud Infrastructure
 
-### 4. Setup Amazon Kendra
+The application is built on AWS with the following services:
 
-```bash
-# Create Kendra index
-aws kendra create-index \
-    --name "RAG Chatbot Index" \
-    --role-arn arn:aws:iam::YOUR_ACCOUNT:role/kendra-service-role \
-    --region us-east-2
+| Service | Purpose | Status |
+|---------|---------|--------|
+| **S3** | Website hosting & document storage | ✅ Active |
+| **Lambda** | API processing (5 functions) | ✅ Active |
+| **DynamoDB** | User & session data | ✅ Active |
+| **Kendra** | Document search & indexing | ✅ Active |
+| **Bedrock** | Claude AI responses | ✅ Active |
+| **API Gateway** | REST API endpoints | ✅ Active |
 
-# Create S3 data source
-aws kendra create-data-source \
-    --index-id YOUR_INDEX_ID \
-    --name "Documents Data Source" \
-    --type S3 \
-    --configuration file://config/s3-datasource-config.json \
-    --role-arn arn:aws:iam::YOUR_ACCOUNT:role/kendra-service-role
-```
+### Current Deployment
 
-### 5. Deploy Frontend
+- **Website URL**: http://rag-chatbot-web-1761415396.s3-website.us-east-2.amazonaws.com
+- **Region**: US East 2
+- **API Endpoints**: 6 (Register, Login, Upload, Chat, Documents, Delete)
+- **Storage**: Unlimited (AWS managed)
 
-```bash
-# Upload static files to S3
-aws s3 cp index.html s3://rag-chatbot-web-1761415396/
-aws s3 cp script.js s3://rag-chatbot-web-1761415396/
-aws s3 cp styles.css s3://rag-chatbot-web-1761415396/
+## 🎯 Usage Guide
 
-# Enable static website hosting
-aws s3 website s3://rag-chatbot-web-1761415396 \
-    --index-document index.html \
-    --error-document index.html
-```
-
-## 🎯 Usage
-
-### 1. Access the Application
-
-Visit the S3 website URL: `http://rag-chatbot-web-1761415396.s3-website.us-east-2.amazonaws.com`
-
-### 2. User Registration/Login
+### 1. Register or Login
 
 ![Login Page](Outputs/Login%20Page.png)
 
-- Create a new account or sign in with existing credentials
-- Secure authentication with JWT tokens
-- Clean, intuitive interface for user management
+**For New Users:**
+- Click "Create Account"
+- Enter your name, email, and password
+- Click "Create Account"
 
-### 3. Upload Documents
+**For Existing Users:**
+- Enter your email and password
+- Click "Sign In"
 
-- Drag and drop PDF, DOC, or DOCX files
-- Files are automatically indexed by Amazon Kendra
-- Maximum file size: 5MB
-- Real-time upload progress indication
+Features:
+- ✅ Secure authentication with encrypted passwords
+- ✅ Session expires after 7 days
+- ✅ Auto-logout for security
+- ✅ Easy account management
 
-### 4. Chat with Documents
+### 2. Upload Your Documents
+
+- **Drag & Drop**: Simply drag files into the upload area
+- **Click to Browse**: Click the dashed box to select files
+- **Supported Formats**: PDF, DOC, DOCX
+- **File Size**: Maximum 5MB per document
+- **Indexing**: Documents are indexed automatically (2-10 minutes)
+
+The Documents panel shows:
+- Document name
+- File size
+- Delete button for each document
+- Upload progress bar
+
+### 3. Chat with Your Documents
 
 ![Chatbot Output using PDFs](Outputs/Chatbot%20Output%20using%20PDFs.png)
 
-- Ask questions about your uploaded documents
-- AI responses are generated using Amazon Bedrock
-- Conversation history is maintained during the session
-- Interactive chat interface with document management panel
+**How to Chat:**
+1. Type your question in the chat input box
+2. Press Enter or click Send
+3. AI searches your documents for relevant information
+4. Response appears in the chat window
+
+**Features:**
+- ✅ AI-powered responses using Claude 3.5 Sonnet
+- ✅ Multi-turn conversations
+- ✅ Real-time chat updates
+- ✅ Scroll through chat history
+- ✅ Copy and share responses
+
+### 4. Manage Chat Sessions
+
+**View Previous Conversations:**
+- Click any session in the "Chat Sessions" panel
+- Your entire conversation history loads
+- Switch between sessions easily
+
+**Start New Chat:**
+- Click "+ New" button
+- All messages are saved automatically
+- Create organized conversations
+
+**Delete Sessions:**
+- Click "Delete" button next to any session
+- Confirmation prompt appears
+- Deleted sessions cannot be recovered
 
 ## 📸 Screenshots
 
@@ -407,21 +397,78 @@ Response:
 - Microsoft Word (.doc, .docx)
 - Maximum file size: 5MB
 
-## 🐛 Troubleshooting
+## 🐛 Troubleshooting Guide
 
-### Common Issues
+### Common Issues & Solutions
 
-1. **CORS Errors**: Ensure API Gateway CORS is properly configured
-2. **Authentication Failures**: Check DynamoDB table permissions
-3. **File Upload Issues**: Verify S3 bucket permissions and Lambda timeout
-4. **AI Response Errors**: Check Bedrock model access and Kendra indexing
+#### ❌ "Login Failed" Error
+**Problem**: Cannot log in to your account
+- **Solution 1**: Check if email and password are correct
+- **Solution 2**: Try registering a new account
+- **Solution 3**: Clear browser cookies and try again
+- **Solution 4**: Try a different browser
 
-### Debug Steps
+#### ❌ Document Upload Fails
+**Problem**: Getting error when trying to upload files
+- **Check**: File size is less than 5MB
+- **Check**: File format is PDF, DOC, or DOCX
+- **Check**: Internet connection is stable
+- **Wait**: Try again after 1 minute
 
-1. Check CloudWatch logs for Lambda functions
-2. Verify IAM role permissions
-3. Test API endpoints individually
-4. Ensure Kendra index is properly configured
+#### ❌ Document Not Appearing in Chat
+**Problem**: Uploaded document but AI can't find it
+- **Wait**: Kendra needs 2-10 minutes to index the document
+- **Check**: Document appears in "Documents" panel
+- **Refresh**: Close and reopen the browser
+- **Ask**: Try asking a different question
+
+#### ❌ Chat Not Responding
+**Problem**: Send message but no response from AI
+- **Wait**: AI response takes 2-5 seconds
+- **Refresh**: Reload the page
+- **Check**: Internet connection is working
+- **Try**: Ask a simpler question
+
+#### ❌ Session Expired
+**Problem**: Logged out suddenly or session invalid
+- **Normal**: Sessions expire after 7 days of inactivity
+- **Solution**: Log in again with your credentials
+- **Prevent**: Check "Remember me" (if available)
+
+#### ❌ Cannot Delete Document
+**Problem**: Delete button not working
+- **Check**: Make sure you own the document
+- **Wait**: Try again after 30 seconds
+- **Refresh**: Reload the page first
+
+---
+
+## ✅ How to Get Help
+
+**Check These First:**
+1. Refresh the page (Ctrl+F5 or Cmd+Shift+R)
+2. Clear browser cookies
+3. Try a different browser
+4. Check your internet connection
+5. Wait 5 minutes and try again
+
+**Still Having Issues?**
+- 📧 Email: saiteja@student.ucmo.edu
+- 💬 Create an issue on GitHub
+- 📞 Check the documentation for more details
+
+---
+
+## 📱 Browser Compatibility
+
+| Browser | Status | Version |
+|---------|--------|---------|
+| Chrome | ✅ Fully Supported | Latest |
+| Safari | ✅ Fully Supported | Latest |
+| Firefox | ✅ Fully Supported | Latest |
+| Edge | ✅ Fully Supported | Latest |
+| Opera | ✅ Supported | Latest |
+| IE 11 | ❌ Not Supported | - |
 
 ## 📈 Future Enhancements
 
