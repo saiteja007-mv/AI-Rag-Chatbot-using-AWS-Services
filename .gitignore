@@ -3,8 +3,7 @@
 # ============================================
 
 # Lambda functions (contain AWS resource IDs and sensitive configurations)
-lambda-functions/*.py
-lambda-functions/*.zip
+lambda-functions/
 
 # AWS configuration files (contain AWS account IDs, resource IDs, and service configurations)
 config/*.json
