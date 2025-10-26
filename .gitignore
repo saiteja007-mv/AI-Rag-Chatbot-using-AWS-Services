@@ -1,3 +1,31 @@
+# ============================================
+# SENSITIVE CONFIGURATION & AWS RESOURCES
+# ============================================
+
+# Lambda functions (contain AWS resource IDs and sensitive configurations)
+lambda-functions/*.py
+lambda-functions/*.zip
+
+# AWS configuration files (contain AWS account IDs, resource IDs, and service configurations)
+config/*.json
+
+# ============================================
+# ENVIRONMENT & CREDENTIALS
+# ============================================
+
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+credentials
+credentials.json
+~/.aws/
+.aws/
+
+# ============================================
+# BUILD & DEPLOYMENT
+# ============================================
+
 # Lambda deployment packages
 *.zip
 
@@ -5,48 +33,98 @@
 *.tmp
 *.temp
 upload-response.json
-
-# Assessment documents
-*.docx
-*.pdf
-
-*.json
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Logs
 *.log
 
-# Environment variables
-.env
-.env.local
+# ============================================
+# DOCUMENTATION
+# ============================================
 
-# Node modules (if any)
-node_modules/
+# Assessment documents and internal docs
+*.docx
+*.pdf
+docs/
 
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
+# ============================================
+# IDE & DEVELOPMENT TOOLS
+# ============================================
 
-# AWS credentials (never commit these)
-.aws/
-credentials
-config
+# VSCode
+.vscode/
+.vscode/*
+!.vscode/extensions.json
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
 
 # Claude AI settings
 .claude/
 
-# Important files 
-docs/
+# ============================================
+# OS-SPECIFIC FILES
+# ============================================
+
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ============================================
+# PYTHON
+# ============================================
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ============================================
+# NODE.JS (if applicable)
+# ============================================
+
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# ============================================
+# BACKUPS & MISC
+# ============================================
+
+*.bak
+*.backup
+*.orig
+.tern-port
