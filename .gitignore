@@ -127,3 +127,6 @@ yarn-error.log
 *.backup
 *.orig
 .tern-port
+
+# Ignore GitHub metadata/CI/workflow instructions kept out of the repo index
+.github/
