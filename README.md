@@ -1,536 +1,389 @@
-# 🤖 RAG Chatbot - AI-Powered Document Q&A
+# 🤖 AWS RAG Chatbot Project
 
-> **An intelligent chatbot built on AWS that leverages Retrieval-Augmented Generation (RAG) to answer questions about your documents with precision and context awareness.**
+**A Retrieval-Augmented Generation (RAG) chatbot built on AWS that allows users to upload documents and ask questions about them using AI.**
 
-![AWS](https://img.shields.io/badge/AWS-Cloud%20Native-FF9900?style=flat-square)
-![Python](https://img.shields.io/badge/Python-3.9-3776AB?style=flat-square)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=flat-square)
-![License](https://img.shields.io/badge/License-MIT-black?style=flat-square)
+[![AWS](https://img.shields.io/badge/AWS-Cloud-orange)](https://aws.amazon.com/)
+[![Lambda](https://img.shields.io/badge/AWS-Lambda-orange)](https://aws.amazon.com/lambda/)
+[![API Gateway](https://img.shields.io/badge/AWS-API%20Gateway-orange)](https://aws.amazon.com/api-gateway/)
+[![S3](https://img.shields.io/badge/AWS-S3-orange)](https://aws.amazon.com/s3/)
+[![DynamoDB](https://img.shields.io/badge/AWS-DynamoDB-orange)](https://aws.amazon.com/dynamodb/)
+[![Bedrock](https://img.shields.io/badge/AWS-Bedrock-purple)](https://aws.amazon.com/bedrock/)
+[![Python](https://img.shields.io/badge/Python-3.11-blue)](https://www.python.org/)
 
-## 📋 Table of Contents
+---
 
-- [🎯 Quick Demo](#-quick-demo)
-- [🚀 Features](#-features)
-- [🏗️ Architecture](#️-architecture)
-- [📁 Project Structure](#-project-structure)
-- [🛠️ AWS Services Used](#️-aws-services-used)
-- [🔧 Setup Instructions](#-setup-instructions)
-- [🎯 Usage](#-usage)
-- [📸 Screenshots](#-screenshots)
-- [🔒 Security Features](#-security-features)
-- [🚀 Performance Optimizations](#-performance-optimizations)
-- [📊 API Endpoints](#-api-endpoints)
-- [🔧 Configuration](#-configuration)
-- [🐛 Troubleshooting](#-troubleshooting)
-- [📈 Future Enhancements](#-future-enhancements)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
-- [👥 Team](#-team)
+## 📑 Table of Contents
 
-## 🎯 Quick Demo
+- [Project Overview](#-project-overview)
+- [Architecture](#-architecture)
+- [Architecture Diagram](#-architecture-diagram)
+- [Project Structure](#-project-structure)
+- [Screenshots](#-screenshots)
+- [Features](#-features)
+- [API Endpoints](#-api-endpoints)
+- [Data Flow](#-data-flow)
+- [Technology Stack](#-technology-stack)
+- [Security](#-security)
+- [Limitations](#-limitations)
+- [License](#-license)
 
-### Login Interface
-![Login Page](Outputs/Login%20Page.png)
+---
 
-### Chat Interface with Document Upload
-![Chatbot Output using PDFs](Outputs/Chatbot%20Output%20using%20PDFs.png)
+## 🎯 Project Overview
 
-## ✨ Features
+This chatbot uses **Amazon Bedrock** (Claude 3.5 Sonnet) for AI inference, **DynamoDB** for vector storage and user management, and **S3** for document storage to provide intelligent answers based on uploaded documents.
 
-### 🔐 **Authentication & Security**
-- Secure user registration and login system
-- PBKDF2-HMAC-SHA256 password hashing (120,000 iterations)
-- Session-based authentication with 7-day token validity
-- User data isolation and privacy protection
+The system implements a **RAG (Retrieval-Augmented Generation)** architecture where:
 
-### 📄 **Document Management**
-- Upload PDF and Word documents (max 5MB each)
-- Automatic document indexing with Amazon Kendra
-- View and delete documents easily
-- Per-user document isolation
+- 📄 Documents are processed and converted into vector embeddings
+- 🔍 User queries are matched against document embeddings using in-memory cosine similarity search
+- 📚 Relevant document context is retrieved and provided to the AI model
+- 💬 The AI generates contextual answers based on the retrieved information
 
-### 💬 **Intelligent Chat Interface**
-- Ask questions about your uploaded documents
-- AI-powered responses using Claude 3.5 Sonnet
-- Multi-turn conversation support
-- Chat history and sessions management
-
-### 💾 **Chat Sessions**
-- Create and manage multiple chat sessions
-- Persistent chat history
-- Switch between previous conversations
-- Delete old sessions
-
-### 📱 **Responsive Design**
-- Desktop, tablet, and mobile optimized
-- Minimal black & white aesthetic
-- Smooth user experience across all devices
-- Touch-friendly interface
+---
 
 ## 🏗️ Architecture
 
-The application uses a serverless architecture with the following AWS services:
+The application follows a **serverless architecture**:
 
-### System Workflow
-![AI-Powered RAG Chat Bot V 2](assets/AI-Powered%20RAG%20Chat%20Bot%20V%202.png)
-*Complete system workflow showing all AWS services and their interactions*
+### Frontend Layer
+- 🌐 Static website hosted on S3
+- 🎨 User interface for authentication, document upload, and chat
 
-### Core Components:
+### API Layer
+- 🚪 API Gateway routes requests to Lambda functions
+- 🌍 CORS enabled for cross-origin requests
 
-- **Frontend**: Static website hosted on S3
-- **API Gateway**: RESTful API endpoints
-- **Lambda Functions**: Serverless compute for business logic
-- **DynamoDB**: User authentication and session management
-- **S3**: Document storage
-- **Amazon Kendra**: Intelligent document search and indexing
-- **Amazon Bedrock**: AI model inference (Claude 3.5 Sonnet & Titan)
+### Backend Layer
+- ⚡ Lambda function handles all business logic
+- 💾 DynamoDB stores user credentials (`rag-chatbot-users` table)
+- 📦 DynamoDB stores document chunks with embeddings (`rag-docs` table)
+- 📁 S3 stores original uploaded documents
+- 🤖 Bedrock provides AI model inference (Claude 3.5 Sonnet and Titan Embeddings)
+- 🔢 NumPy Lambda Layer enables vector calculations for cosine similarity
 
-### Architecture Flow:
+### Authentication
+- 🔐 JWT tokens for user authentication
+- 🛡️ IAM roles for AWS service access
 
-1. **User Authentication**: Users register/login through the frontend, authenticated via Lambda functions and stored in DynamoDB
-2. **Document Upload**: Files are uploaded to S3 and automatically indexed by Amazon Kendra
-3. **AI Processing**: User queries are processed through Kendra search, then enhanced with AI responses via Amazon Bedrock
-4. **Response Delivery**: AI-generated responses are returned through the API Gateway to the frontend
+### Vector Search Process
+1. 👤 User submits query → Lambda generates query embedding (Bedrock Titan)
+2. 🔍 Lambda queries DynamoDB (`rag-docs` table) via `userId-index` GSI
+3. 📊 Lambda calculates cosine similarity in-memory using NumPy for all user's chunks
+4. 📈 Lambda sorts by similarity and returns top 5 matches
+5. 🚀 Lambda sends context to Claude 3.5 Sonnet
+6. ✨ AI response returned to user
 
-The architecture diagram above shows the complete workflow, demonstrating how each AWS service works together to create a seamless RAG chatbot experience.
+---
+
+## 📊 Architecture Diagram
+
+![Workflow Diagram V3](frontend/assets/Ai%20Powered%20RAG%20Chatbot%20V%203.png)
+
+*Architecture workflow diagram showing the complete system flow from user interaction to AI response.*
+
+---
 
 ## 📁 Project Structure
 
 ```
-├── Frontend Files (Root)
-│   ├── index.html          # Main application interface
-│   ├── script.js           # Frontend JavaScript logic
-│   └── styles.css          # Application styling
-├── lambda-functions/       # Lambda function source code
-│   ├── auth-handler.py     # User authentication (login/register)
-│   ├── chat-handler.py     # AI chat processing
-│   ├── upload-handler.py   # Document upload processing
-│   ├── delete-handler.py   # Document deletion
-│   ├── documents-handler.py # Document listing
-│   └── *.zip              # Lambda deployment packages
-├── config/                 # AWS configuration files
-│   ├── bucket-policy.json  # S3 bucket permissions
-│   ├── lambda-trust-policy.json # Lambda execution role
-│   ├── lambda-permissions-policy.json # Lambda permissions
-│   ├── s3-datasource-config.json # Kendra data source config
-│   └── kendra-trust-policy.json # Kendra service role
-├── docs/                   # Project documentation
-│   ├── Teamwork Assessment.docx # Project documentation
-│   └── Teamwork Assessment.pdf  # Project documentation
-├── assets/                 # Project assets and images
-│   ├── AI-Powered RAG Chat Bot V 2.png
-│   └── AI-Powered RAG Chat Bot.png
-├── Outputs/                # Application screenshots
-│   ├── Login Page.png      # Login interface screenshot
-│   └── Chatbot Output using PDFs.png # Chat interface screenshot
-└── README.md              # Project documentation
+AWS Project/
+├── frontend/                      # Frontend web application
+│   ├── index.html                # Main HTML interface
+│   ├── styles.css                # Styling and layout
+│   ├── script.js                 # Client-side logic and API calls
+│   └── assets/                   # Images and icons
+│       ├── Fav_icon_chatbot.png
+│       └── AI-Powered RAG Chat Bot V 3.png  # Workflow diagram
+│
+├── backend/                       # Backend services
+│   ├── lambda/                   # Lambda function code
+│   │   ├── lambda_function.py   # Main handler with all endpoints
+│   │   ├── requirements.txt     # Python dependencies
+│   │   └── lambda-package/      # Packaged dependencies
+│   └── policies/                 # IAM policies
+│       ├── trust-policy.json    # Lambda execution role trust
+│       ├── lambda-policy.json   # Lambda permissions
+│       └── bucket-policy.json   # S3 bucket policy
+│
+├── scripts/                       # Utility scripts
+│   └── update-opensearch-access-policy.py  # Legacy OpenSearch config
+│
+├── docs/                          # Documentation
+│   ├── PROJECT_SUMMARY.md       # Detailed project overview
+│   ├── DEPLOYMENT.md            # Deployment guide
+│   ├── RESOURCES.md             # AWS resources documentation
+│   └── ACCESS_INFO.md           # Access credentials
+│
+└── Outputs/                       # Screenshots and output files
+    ├── Login Page.png
+    └── Chatbot Output using PDFs.png
 ```
-
-## 🛠️ AWS Services Used
-
-### Core Services
-
-- **Amazon S3**: Static website hosting and document storage
-- **Amazon API Gateway**: REST API endpoints
-- **AWS Lambda**: Serverless compute functions
-- **Amazon DynamoDB**: User data and session storage
-
-### AI/ML Services
-
-- **Amazon Kendra**: Intelligent document search and indexing
-- **Amazon Bedrock**: AI model inference
-  - Primary: Claude 3.5 Sonnet (anthropic.claude-3-5-sonnet-20240620-v1:0)
-  - Fallback: Amazon Titan Text Express (amazon.titan-text-express-v1)
-
-### Security & Access
-
-- **IAM Roles**: Service-specific permissions
-- **JWT Tokens**: Secure session management
-- **CORS**: Cross-origin resource sharing
-
-## 🚀 Quick Start Guide
-
-### Prerequisites
-
-- AWS Account with appropriate permissions
-- Modern web browser (Chrome, Safari, Firefox, Edge)
-- Internet connection
-
-### Step 1: Access the Application
-
-Simply visit the deployed website:
-```
-http://rag-chatbot-web-1761415396.s3-website.us-east-2.amazonaws.com
-```
-
-No installation or setup required! The application is already deployed and ready to use.
-
-### Step 2: Create an Account
-
-1. Click **"Register"** on the login page
-2. Enter your name, email, and password
-3. Click **"Create Account"**
-4. You'll be automatically logged in
-
-### Step 3: Upload Documents
-
-1. **Drag & Drop**: Drag PDF or Word files into the upload area
-2. **Or Click**: Click the upload area to select files from your computer
-3. **Supported Formats**:
-   - PDF (.pdf)
-   - Microsoft Word (.doc, .docx)
-4. **Maximum Size**: 5MB per file
-5. **Wait**: Kendra will index the document (2-10 minutes)
-
-### Step 4: Start Chatting
-
-1. Type your question in the chat input box
-2. Press **Enter** or click **Send**
-3. The AI will search your documents and provide an answer
-4. Continue the conversation as needed
-
-### Step 5: Manage Chat Sessions
-
-1. **New Chat**: Click **"+ New"** to start a fresh conversation
-2. **View Previous**: Click any session in the "Chat Sessions" panel
-3. **Delete Session**: Click **"Delete"** next to a session you don't need
 
 ---
-
-## 📁 Project Resources
-
-### Cloud Infrastructure
-
-The application is built on AWS with the following services:
-
-| Service | Purpose | Status |
-|---------|---------|--------|
-| **S3** | Website hosting & document storage | ✅ Active |
-| **Lambda** | API processing (5 functions) | ✅ Active |
-| **DynamoDB** | User & session data | ✅ Active |
-| **Kendra** | Document search & indexing | ✅ Active |
-| **Bedrock** | Claude AI responses | ✅ Active |
-| **API Gateway** | REST API endpoints | ✅ Active |
-
-### Current Deployment
-
-- **Website URL**: http://rag-chatbot-web-1761415396.s3-website.us-east-2.amazonaws.com
-- **Region**: US East 2
-- **API Endpoints**: 6 (Register, Login, Upload, Chat, Documents, Delete)
-- **Storage**: Unlimited (AWS managed)
-
-## 🎯 Usage Guide
-
-### 1. Register or Login
-
-![Login Page](Outputs/Login%20Page.png)
-
-**For New Users:**
-- Click "Create Account"
-- Enter your name, email, and password
-- Click "Create Account"
-
-**For Existing Users:**
-- Enter your email and password
-- Click "Sign In"
-
-Features:
-- ✅ Secure authentication with encrypted passwords
-- ✅ Session expires after 7 days
-- ✅ Auto-logout for security
-- ✅ Easy account management
-
-### 2. Upload Your Documents
-
-- **Drag & Drop**: Simply drag files into the upload area
-- **Click to Browse**: Click the dashed box to select files
-- **Supported Formats**: PDF, DOC, DOCX
-- **File Size**: Maximum 5MB per document
-- **Indexing**: Documents are indexed automatically (2-10 minutes)
-
-The Documents panel shows:
-- Document name
-- File size
-- Delete button for each document
-- Upload progress bar
-
-### 3. Chat with Your Documents
-
-![Chatbot Output using PDFs](Outputs/Chatbot%20Output%20using%20PDFs.png)
-
-**How to Chat:**
-1. Type your question in the chat input box
-2. Press Enter or click Send
-3. AI searches your documents for relevant information
-4. Response appears in the chat window
-
-**Features:**
-- ✅ AI-powered responses using Claude 3.5 Sonnet
-- ✅ Multi-turn conversations
-- ✅ Real-time chat updates
-- ✅ Scroll through chat history
-- ✅ Copy and share responses
-
-### 4. Manage Chat Sessions
-
-**View Previous Conversations:**
-- Click any session in the "Chat Sessions" panel
-- Your entire conversation history loads
-- Switch between sessions easily
-
-**Start New Chat:**
-- Click "+ New" button
-- All messages are saved automatically
-- Create organized conversations
-
-**Delete Sessions:**
-- Click "Delete" button next to any session
-- Confirmation prompt appears
-- Deleted sessions cannot be recovered
 
 ## 📸 Screenshots
 
 ### Login Page
 ![Login Page](Outputs/Login%20Page.png)
-*Clean, modern login interface with registration option*
 
-### Chat Interface
-![Chatbot Output using PDFs](Outputs/Chatbot%20Output%20using%20PDFs.png)
-*Interactive chat interface showing document upload and AI responses*
+*User authentication interface showing the login form for accessing the chatbot.*
 
-### Application Features Showcase
+### Chatbot Output
+![Chatbot Output using PDFs](outputs/Chat_Interface%20with%20Chat.png)
 
-The screenshots above demonstrate the key features of the RAG chatbot:
+*Example of the chatbot interface showing a conversation with AI responses based on uploaded PDF documents.*
 
-**Login Page Features:**
-- User-friendly authentication interface
-- Registration and login forms
-- Clean, modern design with black and white theme
-- Responsive layout
+---
 
-**Chat Interface Features:**
-- Document upload area with drag-and-drop functionality
-- Real-time chat with AI responses
-- Document management panel
-- User session information
-- Interactive Q&A based on uploaded documents
+## ✨ Features
 
-## 🔒 Security Features
+### 🔐 User Authentication
+- **Registration**: Users can create accounts with email and password
+- **Login**: Secure authentication using JWT tokens
+- **Session Management**: Tokens expire after 7 days
 
-- **Password Hashing**: PBKDF2 with 120,000 iterations
-- **JWT Tokens**: Secure session management with expiration
-- **User Isolation**: Documents are stored per user with access controls
-- **CORS Protection**: Configured for secure cross-origin requests
-- **Input Validation**: File type and size validation
+### 📄 Document Management
+- **Upload**: Supports PDF and DOCX file formats
+- **Processing**: Documents are automatically chunked and embedded
+- **Storage**: Files stored in S3 with user-specific organization
+- **Indexing**: Document chunks stored in DynamoDB (`rag-docs` table) with vector embeddings
+- **View**: Users can view their uploaded documents
+- **Delete**: Users can delete their documents (removes from both S3 and DynamoDB)
 
-## 🚀 Performance Optimizations
+### 💬 AI Chat
+- **Query Processing**: User questions are converted to embeddings using Titan Embeddings V2
+- **Semantic Search**: Finds most relevant document chunks using in-memory cosine similarity
+- **Context Retrieval**: Retrieves top 5 most relevant document segments
+- **Answer Generation**: Claude 3.5 Sonnet generates answers based on retrieved context
+- **Chat History**: Maintains conversation context
 
-- **Serverless Architecture**: Auto-scaling Lambda functions
-- **Intelligent Caching**: Kendra indexing for fast document search
-- **Fallback Models**: Primary and backup AI models for reliability
-- **Efficient Storage**: S3 for scalable document storage
+---
 
-## 📊 API Endpoints
+## 🔌 API Endpoints
 
-### Authentication
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/register` | POST | Create new user account |
-| `/login` | POST | Authenticate user |
+### `POST /register`
+**Description:** Register a new user account
 
-### Documents
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/upload` | POST | Upload document to S3 |
-| `/documents` | GET | List all user documents |
-| `/delete` | POST | Delete document |
-
-### Chat
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/chat` | POST | Send message & get AI response |
-
-### Request/Response Examples
-
-**POST /chat**
+**Input:**
 ```json
 {
-  "message": "What is the main topic?",
-  "chatHistory": [
-    { "role": "user", "content": "Hello" },
-    { "role": "assistant", "content": "Hi there!" }
-  ]
-}
-
-Response:
-{
-  "response": "The document discusses..."
+  "name": "User Name",
+  "email": "user@example.com",
+  "password": "password123"
 }
 ```
 
-**POST /upload**
+**Output:**
 ```json
 {
-  "fileName": "report.pdf",
-  "fileContent": "base64encodedcontent...",
+  "token": "jwt_token_here",
+  "user": {
+    "id": "user-uuid",
+    "name": "User Name",
+    "email": "user@example.com"
+  },
+  "expiresAt": "2025-11-08T20:00:00"
+}
+```
+
+---
+
+### `POST /login`
+**Description:** Authenticate user and receive JWT token
+
+**Input:**
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+**Output:**
+```json
+{
+  "token": "jwt_token_here",
+  "user": {
+    "id": "user-uuid",
+    "name": "User Name",
+    "email": "user@example.com"
+  },
+  "expiresAt": "2025-11-08T20:00:00"
+}
+```
+
+---
+
+### `POST /upload`
+**Description:** Upload and process a document
+
+**Authentication:** Required (Bearer token)
+
+**Input:**
+```json
+{
+  "fileName": "document.pdf",
+  "fileContent": "base64_encoded_file_content",
   "fileType": "application/pdf"
 }
+```
 
-Response:
+**Output:**
+```json
 {
-  "fileId": "documents/user123/abc123-report.pdf"
+  "message": "File uploaded successfully",
+  "fileId": "user-uuid/document-uuid_document.pdf",
+  "chunks": 15
 }
 ```
 
-## 🔧 Configuration
-
-### Environment Variables
-
-- `BEDROCK_REGION`: AWS region for Bedrock (us-east-1)
-- `DOCUMENTS_BUCKET`: S3 bucket for document storage
-- `KENDRA_INDEX_ID`: Amazon Kendra index identifier
-- `KENDRA_DATA_SOURCE_ID`: Kendra data source identifier
-
-### Supported File Types
-
-- PDF (.pdf)
-- Microsoft Word (.doc, .docx)
-- Maximum file size: 5MB
-
-## 🐛 Troubleshooting Guide
-
-### Common Issues & Solutions
-
-#### ❌ "Login Failed" Error
-**Problem**: Cannot log in to your account
-- **Solution 1**: Check if email and password are correct
-- **Solution 2**: Try registering a new account
-- **Solution 3**: Clear browser cookies and try again
-- **Solution 4**: Try a different browser
-
-#### ❌ Document Upload Fails
-**Problem**: Getting error when trying to upload files
-- **Check**: File size is less than 5MB
-- **Check**: File format is PDF, DOC, or DOCX
-- **Check**: Internet connection is stable
-- **Wait**: Try again after 1 minute
-
-#### ❌ Document Not Appearing in Chat
-**Problem**: Uploaded document but AI can't find it
-- **Wait**: Kendra needs 2-10 minutes to index the document
-- **Check**: Document appears in "Documents" panel
-- **Refresh**: Close and reopen the browser
-- **Ask**: Try asking a different question
-
-#### ❌ Chat Not Responding
-**Problem**: Send message but no response from AI
-- **Wait**: AI response takes 2-5 seconds
-- **Refresh**: Reload the page
-- **Check**: Internet connection is working
-- **Try**: Ask a simpler question
-
-#### ❌ Session Expired
-**Problem**: Logged out suddenly or session invalid
-- **Normal**: Sessions expire after 7 days of inactivity
-- **Solution**: Log in again with your credentials
-- **Prevent**: Check "Remember me" (if available)
-
-#### ❌ Cannot Delete Document
-**Problem**: Delete button not working
-- **Check**: Make sure you own the document
-- **Wait**: Try again after 30 seconds
-- **Refresh**: Reload the page first
-
-**Still Having Issues?**
-- 📧 Email: saiteja.motukuri@gmail.com
-- 💬 Create an issue on GitHub
-- 📞 Check the documentation for more details
-
 ---
 
-## 📱 Browser Compatibility
+### `GET /documents`
+**Description:** List all documents for the authenticated user
 
-| Browser | Status | Version |
-|---------|--------|---------|
-| Chrome | ✅ Fully Supported | Latest |
-| Safari | ✅ Fully Supported | Latest |
-| Firefox | ✅ Fully Supported | Latest |
-| Edge | ✅ Fully Supported | Latest |
-| Opera | ✅ Supported | Latest |
-| IE 11 | ❌ Not Supported | - |
+**Authentication:** Required (Bearer token)
 
-## 📈 Future Enhancements
+**Input:** None (uses authentication token)
 
-- [ ] Support for additional file formats (TXT, RTF)
-- [ ] Real-time document processing status
-- [ ] Advanced search filters
-- [ ] Document sharing capabilities
-- [ ] Multi-language support
-- [ ] Analytics dashboard
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 👥 Team
-
-**Developer**: Sai Teja
-**Institution**: University of Central Missouri
-**Course**: Intro to Cloud Computing (Fall 2025)
-
-
----
-
-## 📈 Performance
-
-| Metric | Value |
-|--------|-------|
-| Page Load Time | < 2 seconds |
-| Chat Response Time | 2-5 seconds |
-| Document Upload | < 10 seconds |
-| Kendra Indexing | 2-10 minutes |
-| Session Expiry | 7 days |
-
----
-
-## 📝 Notes
-
-**⚠️ Important**: This is a demonstration project showcasing AWS serverless architecture and AI integration. For production use, ensure:
-- Enhanced security measures
-- Data encryption at rest and in transit
-- Comprehensive error handling
-- Rate limiting and DDoS protection
-- Compliance with data protection regulations
-
----
-
-<div align="center">
-
-### 🌟 If you find this project helpful, please consider giving it a star! ⭐
-
-**Built with ❤️ on AWS Cloud**
-
-```
-  ┌─────────────────────────────────────┐
-  │  RAG Chatbot - AI Document Q&A      │
-  │  Powered by AWS & Claude AI         │
-  └─────────────────────────────────────┘
+**Output:**
+```json
+{
+  "documents": [
+    {
+      "s3Key": "user-uuid/document-uuid_document.pdf",
+      "name": "document.pdf",
+      "size": 245760,
+      "sizeReadable": "240.00 KB",
+      "uploadDate": "2025-11-01T20:00:00"
+    }
+  ]
+}
 ```
 
-[Live Demo](#) • [Documentation](#) • [GitHub](#) • [Contact](#)
+---
 
-</div>
+### `POST /delete`
+**Description:** Delete a document and its associated chunks
+
+**Authentication:** Required (Bearer token)
+
+**Input:**
+```json
+{
+  "fileKey": "user-uuid/document-uuid_document.pdf"
+}
+```
+
+**Output:**
+```json
+{
+  "message": "File deleted successfully"
+}
+```
 
 ---
 
-**Last Updated**: October 2025
-**Version**: 2.0
-**Status**: Active Development
+### `POST /chat`
+**Description:** Send a chat message and receive AI response based on uploaded documents
+
+**Authentication:** Required (Bearer token)
+
+**Input:**
+```json
+{
+  "message": "What is lecture 3 about?",
+  "chatHistory": []
+}
+```
+
+**Output:**
+```json
+{
+  "response": "Lecture 3 covers the fundamentals of...",
+  "sourcesCount": 5
+}
+```
+
+---
+
+## 🔄 Data Flow
+
+### Document Upload Flow
+1. 👤 User uploads document through frontend
+2. 📤 File is base64 encoded and sent to `/upload` endpoint
+3. ⚡ Lambda function:
+   - ✅ Validates authentication
+   - 🔓 Decodes file content
+   - 📤 Uploads to S3 with user-specific path
+   - 📄 Extracts text from PDF/DOCX
+   - ✂️ Splits text into chunks (~500 words each)
+   - 🔢 Generates embeddings for each chunk using Titan Embeddings V2
+   - 💾 Stores chunks in DynamoDB (`rag-docs` table) with embeddings
+4. ✅ Returns success confirmation with chunk count
+
+### Chat Query Flow
+1. 👤 User submits question through frontend
+2. 📤 Query sent to `/chat` endpoint
+3. ⚡ Lambda function:
+   - ✅ Validates authentication
+   - 🔢 Converts query to embedding using Titan Embeddings V2
+   - 🔍 Queries DynamoDB (`rag-docs` table) using `userId-index` GSI to get all user's chunks
+   - 📊 Calculates cosine similarity in-memory using NumPy for all chunks
+   - 📈 Sorts by similarity score and selects top 5 matches
+   - 📚 Builds context from retrieved chunks
+   - 🤖 Sends query and context to Claude 3.5 Sonnet
+   - ✨ Returns AI-generated response
+4. 💬 Response displayed to user
+
+---
+
+## 🛠️ Technology Stack
+
+| Category | Technology |
+|----------|-----------|
+| **Frontend** | HTML5, CSS3, Vanilla JavaScript |
+| **Backend** | AWS Lambda (Python 3.11) |
+| **AI Model** | Amazon Bedrock |
+|  | • Claude 3.5 Sonnet (text generation) |
+|  | • Titan Embeddings V2 (vector embeddings, 1024 dimensions) |
+| **Vector Storage** | Amazon DynamoDB (`rag-docs` table) |
+| **Vector Search** | In-memory cosine similarity using NumPy (Lambda Layer) |
+| **Database** | Amazon DynamoDB (`rag-chatbot-users` table) |
+| **Storage** | Amazon S3 (document storage and website hosting) |
+| **API** | Amazon API Gateway (REST API) |
+| **Authentication** | JWT tokens |
+
+---
+
+## 🔒 Security
+
+- 🔐 User passwords are hashed using SHA256
+- 🎫 JWT tokens expire after 7 days
+- 🔒 API endpoints require authentication (except register/login)
+- 🔐 S3 documents bucket is private
+- 🛡️ DynamoDB uses IAM roles for access control
+- ✅ IAM roles enforce least privilege access
+- 🌍 CORS configured for API Gateway
+
+---
+
+## ⚠️ Limitations
+
+- 📏 Maximum file size: ~5MB (practical limit)
+- 📄 Supported formats: PDF and DOCX only
+- 🔢 Embedding dimension: 1024 (Titan V2)
+- ✂️ Chunk size: ~500 words per chunk
+- 🔍 Search results: Top 5 most relevant chunks
+- ⏰ Token expiration: 7 days
+- ⚡ **In-memory search**: Performance depends on number of chunks per user (scales well for typical use cases)
+
+---
+
+## 📝 License
+
+This project is for educational purposes.
+
+---
+

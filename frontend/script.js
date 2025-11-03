@@ -1,5 +1,5 @@
 // API Configuration - Will be updated after API Gateway creation
-const API_BASE_URL = 'https://juj0jhl4i0.execute-api.us-east-2.amazonaws.com/prod';
+const API_BASE_URL = 'https://t4dqxdzke7.execute-api.us-east-2.amazonaws.com/prod';
 
 // Global state
 let authToken = null;
