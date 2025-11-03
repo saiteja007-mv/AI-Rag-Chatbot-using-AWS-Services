@@ -125,7 +125,7 @@ AWS Project/
 ## 📸 Screenshots
 
 ### Login Page
-![Login Page](Outputs/Login%20Page.png)
+![Login Page](outputs/Login%20page.png)
 
 *User authentication interface showing the login form for accessing the chatbot.*
 
