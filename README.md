@@ -381,6 +381,76 @@ AWS Project/
 
 ---
 
+## 👥 Team Access & Collaboration
+
+This project includes IAM policies for team collaboration, allowing teammates to work on the project with appropriate AWS permissions.
+
+### IAM Policy for Team Members
+
+**Policy Name**: `rag-chatbot-developer-policy`
+
+This policy grants team members access to all necessary AWS resources for development, testing, and debugging.
+
+### 🔑 Permissions Included
+
+**1. Lambda Functions**
+- View, update, and invoke Lambda functions
+- Manage function configurations
+- Access Lambda layers
+- List function versions and aliases
+
+**2. DynamoDB Tables**
+- Full CRUD operations on `rag-chatbot-users` and `rag-docs` tables
+- Query and scan tables
+- Describe table configurations
+- Access table indexes
+
+**3. S3 Buckets**
+- Read, write, and delete objects
+- List bucket contents
+- Access both website and documents buckets
+- View bucket policies
+
+**4. Amazon Bedrock**
+- Invoke AI models (Claude 3.5 Sonnet and Titan Embeddings V2)
+- List and view foundation models
+- Access inference profiles
+
+**5. API Gateway**
+- View and modify API configurations
+- Manage endpoints, methods, and deployments
+
+**6. CloudWatch Logs**
+- View and filter Lambda execution logs
+- Access log groups and streams for debugging
+- Monitor application performance
+
+**7. IAM & CloudFormation (Read-Only)**
+- View roles and policies
+- List CloudFormation stacks
+- Review resource configurations
+
+### 📦 Resources Covered
+
+- **Lambda**: `lambda functions`
+- **DynamoDB**: `rag-chatbot-users`, `rag-docs` (including GSI indexes)
+- **S3**: `rag-chatbot-documents-*`, `rag-chatbot-website-*`
+- **Bedrock**: Titan Embeddings V2, Claude inference profiles
+- **CloudWatch Logs**: `/aws/lambda/rag-chatbot-*`
+
+### 🚀 How Team Members Access the Project
+
+1. **IAM User Setup**: Admin creates IAM user and attaches `rag-chatbot-developer-policy`
+2. **AWS CLI Configuration**: Team members configure AWS CLI with provided credentials
+3. **Console Access**: Login to AWS Console with IAM user credentials
+4. **Development**: Full access to modify Lambda code, test APIs, view logs, and debug issues
+
+### 🔒 Security Note
+
+This policy follows the **principle of least privilege**, granting only the permissions necessary for development and debugging of this specific RAG chatbot project. Team members cannot access other AWS resources outside this project scope.
+
+---
+
 ## 📝 License
 
 This project is for educational purposes.
